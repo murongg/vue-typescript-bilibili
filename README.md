@@ -10,7 +10,27 @@ npm install -g @vue/cli
 yarn global add @vue/cli
 ```
 
-添加 **Typescript**：
+创建项目，执行命令：
+
+```bash
+vue create bilibili
+```
+
+根据以下选项进行创建：
+
+```bash
+? Please pick a preset: Manually select features
+? Check the features needed for your project: Choose Vue version, Babel, Linter
+? Choose a version of Vue.js that you want to start the project with 3.x (Preview)
+? Pick a linter / formatter config: Prettier
+? Pick additional lint features: Lint on save, Lint and fix on commit
+? Where do you prefer placing config for Babel, ESLint, etc.? In dedicated config files
+? Save this as a preset for future projects? No
+```
+
+
+
+添加 **Typescript**，执行命令：
 
 ```bash
 vue add typescript
@@ -20,11 +40,22 @@ vue add typescript
 
 ```bash
 ? Use class-style component syntax? No
-? Use Babel alongside TypeScript (required for modern mode, auto-detected polyfi
-lls, transpiling JSX)? Yes
+? Use Babel alongside TypeScript (required for modern mode, auto-detected polyfills, transpiling JSX)? Yes
 ? Convert all .js files to .ts? Yes
 ? Allow .js files to be compiled? Yes
 ? Skip type checking of all declaration files (recommended for apps)? Yes
+```
+
+添加 **vue-router**，执行命令：
+
+```
+vue add router
+```
+
+添加 **vuex**，执行命令：
+
+```
+vue add vuex
 ```
 
 至此，项目创建完成。
@@ -73,12 +104,34 @@ yarn add normalize.css
 ```typescript
 import { createApp } from "vue";
 import App from "./App.vue";
-import 'normalize.css'
+import router from "./router";
+import store from "./store";
+import "normalize.css";
 
-createApp(App).mount("#app");
+createApp(App)
+  .use(store)
+  .use(router)
+  .mount("#app");
 ```
 
-### 3、删除项目无用代码，为接下来的开发做准备
+### 3、为项目添加 less css 预处理器
+
+执行命令：
+
+```bash
+npm install less less-loader
+# or
+yarn add less less-loader
+```
+
+在 assets/css 文件夹下创建：index.less、mixins.less、variables.less 以作备用，并在 index.less 文件内引入 mixins.less、variables.less，代码如下：
+
+```less
+@import "./variables.less";
+@import "./mixins.less";
+```
+
+### 4、删除项目无用代码，为接下来的开发做准备
 
 修改 App.vue 文件，并删除 components 目录下的 Helloword.vue 文件，与 assets 目录下的 logo.png 文件。
 
@@ -96,5 +149,69 @@ export default defineComponent({
   name: "App"
 });
 </script>
+```
+
+### 5、添加 iconfont
+
+Iconfont 字体图标文件我已准备好，下载后将所有文件放入 assets/iconfont 文件夹内即可，同时在 main.ts 内引入：
+
+```typescript
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import "normalize.css";
+import "@/assets/iconfont/iconfont.css";
+
+createApp(App)
+  .use(store)
+  .use(router)
+  .mount("#app");
+```
+
+### 6、为项目添加 rem 适配
+
+执行命令：
+
+```bash
+npm install lib-flexible postcss-px2rem-exclude
+# or
+yarn add lib-flexible postcss-px2rem-exclude
+```
+
+安装完成后，在 main.ts 引入 `lib-flexible`，代码如下：
+
+```typescript
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
+import "normalize.css";
+import "lib-flexible";
+import "@/assets/iconfont/iconfont.css";
+
+createApp(App)
+  .use(store)
+  .use(router)
+  .mount("#app");
+```
+
+在根目录新建 vue.config.ts 文件，在文件内添加如下代码：
+
+```typescript
+module.exports = {
+  css: {
+    loaderOptions: {
+      postcss: {
+        plugins: [
+          require("postcss-px2rem-exclude")({
+            remUnit: 75, // 换算的基数
+            exclude: /node_modules|folder_name/i // 排除无需转换的文件夹
+          })
+        ]
+      }
+    }
+  },
+}
 ```
 
